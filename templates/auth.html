@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang='en'>
+	<head>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source Code Pro">
+		<title>AuthJS</title>
+		<style>
+			.replit-auth-button{
+				display:none;
+			}
+		</style>
+	</head>
+<body>
+	<p style='font-family:Source Code Pro;font-size:64px;text-align:center;'>AuthJS</p>
+<script>
+	function setCookie(cname, cvalue, exdays) {
+  const d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  let expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+function checkCookie(n) {
+  let username = getCookie(n);
+  if (username != "") {
+   return true;
+  } 
+  else {
+    return false;
+}
+}
+	function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+	var dt = undefined;
+function consent(){
+	window.opener.done(dt);
+	window.close();
+}
+function login(un,passwd){
+	var xhttp = new XMLHttpRequest();
+	var authed = false;
+	xhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+		if (JSON.parse(this.responseText)['status']){
+			if(!authed){
+			authed = true;
+			dt = {'status':true};
+			if (Object.values(_data).indexOf('username') > -1){
+			dt['username'] = un;
+			}
+			if (Object.values(_data).indexOf('firstname') > -1){
+			var f = JSON.parse(this.responseText)['firstname'];
+			dt['firstname'] = f;
+			}
+			if (Object.values(_data).indexOf('lastname') > -1){
+			dt['lastname'] = JSON.parse(this.responseText)['lastname'];
+			}
+				{% if not blk %}
+			document.getElementById('consent').style.display = '';
+			document.getElementById('da').innerHTML += un+'!';
+			document.getElementById('form').style.display = 'none';
+				{% else %}
+				consent();
+				{% endif %}
+			}
+		}
+		else{
+			document.getElementById('form').innerHTML = `<div class="alert alert-danger alert-dismissible">
+  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  <strong>Error!</strong> Invalid username or password.
+  </div>`+document.getElementById('form').innerHTML;
+		}
+		}
+  };
+	xhttp.open("POST", "checklogin");
+xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+xhttp.send(`un=${un}&passwd=${passwd}&req=${encodeURIComponent(JSON.stringify(_data))}&rmb=${JSON.stringify(document.getElementById('rmb').checked)}`);
+}
+</script>
+<div class="container-fluid" id='consent' style='display:none;'>
+	<p id='da'>Hi </p>
+	<p id='dat'>{{name}} would like to access your: </p>
+<button type="button" class="btn btn-outline-primary" onclick='consent()'>Share your data with {{name}}?</button>
+<script>
+function decodeHtml(html) {
+    var txt = document.createElement("textarea");
+    txt.innerHTML = html;
+    return txt.value;
+}
+_data = JSON.parse(decodeHtml(`{{p}}`));
+JSON.parse(decodeHtml(`{{p}}`)).forEach(function(item,cnt){
+	if (cnt != 0){
+	document.getElementById('dat').innerHTML += ', '+item
+	}
+	else{
+		document.getElementById('dat').innerHTML += item
+	}
+});
+document.getElementById('dat').innerHTML += '.';
+</script>
+</div>
+<div class="container-fluid" id='form'>
+<input id='un' placeholder='Username' class="form-control"/>
+<input id='passwd' placeholder='Password' type='password' class="form-control"/>
+{% if not blk %}
+<div class="form-check">
+	<label class="form-check-label">Remember Me </label>
+  <input class="form-check-input" type="checkbox" id="rmb" checked>
+</div>
+{% else %}
+<input type="checkbox" id="rmb" checked style='display:none'/>
+{% endif %}
+<button onclick='login(document.getElementById("un").value,document.getElementById("passwd").value)' class="btn btn-outline-primary">Login</button>
+<script>
+document.addEventListener('keydown',function(event){
+	if (event.key == 'Enter'){
+	login(document.getElementById("un").value,document.getElementById("passwd").value);
+	}
+});
+</script>
+	<!--<div>
+		<p>Or: </p><button class="btn btn-outline-primary" onclick="document.getElementsByClassName('replit-auth-button')[0].click()">Login With Replit</button>
+		<script authed="location.reload()" src="https://auth.util.repl.co/script.js"></script>
+	</div>-->
+<p>No account? <a href='/signup' target='_blank'>Signup</a>.</p>
+</div>
+</body>
+</html>

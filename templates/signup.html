@@ -1,0 +1,104 @@
+<title>Signup | AuthJS</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://kit.fontawesome.com/a458226977.js" crossorigin="anonymous"></script>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source Code Pro">
+<script>function setCookie(cname, cvalue, exdays) {
+  const d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  let expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+function checkCookie(n) {
+  let username = getCookie(n);
+  if (username != "") {
+   return true;
+  } 
+  else {
+    return false;
+}
+}
+	function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+if(checkCookie('i')){
+	window.location.href = '/dev-account';
+}
+</script>
+<div style='text-align:center'>
+	<p style='font-family:Source Code Pro;font-size:64px;text-align:center;'>AuthJS</p>
+<button type="button" class="btn btn-outline-success" onclick='window.location.href="/"'><i class="fa fa-house-chimney"></i> Home</button>
+<div id='alert'></div>
+<script>
+function signup(){
+	document.getElementById('spinner').innerHTML = '<div class="spinner-border text-primary"></div>';
+	const xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+		document.getElementById('spinner').innerHTML = '';
+		if(JSON.parse(this.responseText)['status']){
+		window.location.href = '/account';
+    }
+	}
+	else{
+		document.getElementById('alert').innerHTML = `<div class="alert alert-danger alert-dismissible">
+  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  <strong>Error!</strong> ${JSON.parse(this.responseText)['error']}
+</div>`;
+	}
+  };
+  xhttp.open("POST", "/_signup");
+  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  var un = document.getElementById('un').value;
+  var fn = document.getElementById('fn').value;
+  var ln = document.getElementById('ln').value;
+  var passwd = document.getElementById('passwd').value;
+  xhttp.send(`un=${un}&passwd=${passwd}&fn=${fn}&ln=${ln}`);
+}
+</script>
+<div id='spinner'>
+	
+</div>
+	<br/>
+</div>
+<div class="input-group">
+    <span class="input-group-text">Firstname: </span>
+<input type='text' id='fn' class="form-control"/>
+</div>
+<br/>
+<div class="input-group">
+    <span class="input-group-text">Lastname: </span>
+<input type='text' id='ln' class="form-control"/>
+</div>
+<br/>
+<div class="input-group">
+    <span class="input-group-text">Username: </span>
+<input type='text' id='un' class="form-control"/>
+</div>
+<br/>
+<div class="input-group">
+    <span class="input-group-text">Password: </span>
+<input type='password' id='passwd' class="form-control"/>
+</div>
+<br/>
+<button onclick='signup()' class="btn btn-outline-primary">Signup</button>
+<script>
+document.addEventListener('keydown',function(event){
+	if (event.key == 'Enter'){
+		signup();
+	}
+});
+</script>

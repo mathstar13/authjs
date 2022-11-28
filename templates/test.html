@@ -1,0 +1,7 @@
+<script src='https://authjs.greatusername.repl.co/dev/dev/auth.js'></script>
+<p id='d'></p>
+<script>
+authjs(function(data){
+	document.getElementById('d').innerHTML = 'Hello '+data['firstname']+' '+data['lastname']+'!';
+},['username','firstname','lastname']);
+</script>

@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+	<head>
+<title>{{name}}'s Developer Account | AuthJS</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<script src="https://kit.fontawesome.com/a458226977.js" crossorigin="anonymous"></script>
+	</head>
+	<body>
+<style>
+.center{
+	text-align: center;
+}
+</style>
+<h1 class='center'>Hello {{name}}!</h1>
+<div class="text-center" id='c'>
+<button type="button" class="btn btn-outline-danger" onclick='setCookie("di","",-30);window.location.href = "/dev"'>Log Out</button>
+	<br/>
+<button type="button" class="btn btn-outline-success" onclick='window.location.href="/dev"'><i class="fa fa-house-chimney"></i> Home</button>
+</div>
+<script>
+	function copyTextToClipboard(text) {
+  var textArea = document.createElement("textarea");
+  textArea.style.position = 'fixed';
+  textArea.style.top = 0;
+  textArea.style.left = 0;
+  textArea.style.width = '2em';
+  textArea.style.height = '2em';
+  textArea.style.padding = 0;
+  textArea.style.border = 'none';
+  textArea.style.outline = 'none';
+  textArea.style.boxShadow = 'none';
+  textArea.style.background = 'transparent';
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+
+  try {
+    var successful = document.execCommand('copy');
+  } catch (err) {
+    console.log('Oops, unable to copy');
+  }
+
+  document.body.removeChild(textArea);
+}
+function setCookie(cname, cvalue, exdays) {
+  const d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  let expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+function checkCookie(n) {
+  let username = getCookie(n);
+  if (username != "") {
+   return true;
+  } 
+  else {
+    return false;
+}
+}
+	function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+function chg(n){
+	const xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+		if(this.responseText == 'err'){
+			document.getElementById('c').innerHTML += '<div class="alert alert-danger alert-dismissible"><button type="button" class="btn-close" data-bs-dismiss="alert"></button><strong>Error!</strong> An Error has occured.</div>';
+		}
+		else{
+			document.getElementById('c').innerHTML += '<div class="alert alert-success alert-dismissible"><button type="button" class="btn-close" data-bs-dismiss="alert"></button><strong>Success!</strong> '+this.responseText+' has been changed. <i>Note: You may need to reload the page for any changes to take effect.</i></div>';
+		}
+    }
+  };
+  xhttp.open("POST", "/_dchgv");
+	xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhttp.send(`ty=${n}&v=${document.getElementById(n).value}`);
+}
+if(!checkCookie('di')){
+	window.location.href = '/login';
+}
+</script>
+<div id='alert'></div>
+<script>
+var urlcnt = 1;
+function decodeHtml(html) {
+    var txt = document.createElement("textarea");
+    txt.innerHTML = html;
+    return txt.value;
+}
+function addurl(){
+	urlcnt += 1;
+	document.getElementById('tb').innerHTML += `<div class="input-group"><span class="input-group-text">Url #${urlcnt}: </span><input type='text' id='url${urlcnt}' class="form-control"/><button onclick='chg("url${urlcnt}")' class="btn btn-outline-primary">Change</button></div>`;
+	return document.getElementById(`url${urlcnt}`);
+}
+</script>
+<div id='spinner'>
+	
+</div>
+		<div class="input-group">
+    <span class="input-group-text">HTML code: </span>
+<input type='text' id='n' class="form-control" value='<script src="https://authjs.greatusername.repl.co/dev/{{un}}/auth.js" crossorigin="anonymous"></script>' disabled/>
+	<button onclick='copyTextToClipboard("<script src=\"https://authjs.greatusername.repl.co/dev/{{un}}/auth.js\" crossorigin=\"anonymous\"></script>")' class="btn btn-outline-primary">Copy</button>
+</div>
+		<br/>
+<div class="input-group">
+    <span class="input-group-text">Name: </span>
+<input type='text' id='n' class="form-control" value='{{name}}' placeholder='{{name}}'/>
+	<button onclick='chg("n")' class="btn btn-outline-primary">Change</button>
+</div>
+<br/>
+<div class="input-group">
+    <span class="input-group-text">Username: </span>
+<input type='text' id='un' class="form-control" value='{{un}}' placeholder='{{un}}' disabled/>
+</div>
+<br/>
+<button data-bs-toggle="collapse" data-bs-target="#urls" class="btn btn-outline-primary">URLs</button>
+
+<div id="urls" class="collapse">
+	<div id='tb'>
+<div class="input-group">
+    <span class="input-group-text">Url #1: </span>
+<input type='text' id='url1' class="form-control" value='{{url1}}' placeholder='{{url1}}'/>
+	<button onclick='chg("url1")' class="btn btn-outline-primary">Change</button>
+</div>
+	</div>
+<br/>
+<p onclick='addurl()'><i class="fas fa-plus"></i></p>
+</div>
+<br/>
+<script>
+var urls = JSON.parse(decodeHtml(`{{urls}}`));
+for(i in urls){
+	i = urls[i];
+	var v = addurl();
+	v.value = i;
+	v.placeholder = i;
+}</script>
+	</body>
+</html>
